@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js'
 
-export interface BaseProps {
+interface BaseProps {
   image: string
 }
 

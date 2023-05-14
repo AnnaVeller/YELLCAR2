@@ -1,23 +1,56 @@
 import { Scene } from './Scene'
 import { Road } from '../Road'
 import { Car } from '../Car'
+import * as PIXI from 'pixi.js'
+import { FigureManager } from '../FigureManager'
+import { Figure } from '../Figure'
 
 export class MainScene extends Scene {
   private road: Road
   private car: Car
 
-  constructor() {
+  private leftBoarder: number
+  private rightBoarder: number
+  private upBoarder: number
+  private downBoarder: number
+
+  private app: PIXI.Application
+
+  private figureManager: FigureManager
+
+  constructor(config: { app: PIXI.Application }) {
     super()
+
+    this.app = config.app
 
     // add road
     this.road = new Road()
     this.container.addChild(this.road.container)
 
+    // add figures
+    this.figureManager = new FigureManager()
+    this.container.addChild(this.figureManager.container)
+
     // add car
-    this.car = new Car()
+    this.car = new Car({ scene: this })
     this.container.addChild(this.car.container)
 
     document.addEventListener('keydown', (key: KeyboardEvent) => this.onKeyDown(key))
+  }
+
+  override update() {
+
+    const playerCord = this.car.container.position
+
+    const figures: Array<Figure> | [] = this.figureManager.figures.filter(figure => this.dist(
+      figure.container.position.x - playerCord.x,
+      figure.container.position.y - playerCord.y) < 120)
+
+    figures.forEach(el => el.container.visible = false)
+  }
+
+  private dist(a: number, b: number) {
+    return Math.sqrt(a * a + b * b)
   }
 
   private onKeyDown(key: KeyboardEvent) {
@@ -45,5 +78,38 @@ export class MainScene extends Scene {
       this.car.moveDown()
     }
   }
+
+  public checkBorders(x: number, y: number) {
+    if (x < this.leftBoarder) x = this.leftBoarder
+    if (x > this.rightBoarder) x = this.rightBoarder
+    if (y < this.upBoarder) y = this.upBoarder
+    if (y > this.downBoarder) y = this.downBoarder
+
+    return { x, y }
+  }
+
+  private updateBoarder(screenHeight: number) {
+    this.leftBoarder = 200
+    this.rightBoarder = 1000 - 200
+    this.upBoarder = 130
+    this.downBoarder = screenHeight / this.container.scale.x - 150
+  }
+
+  override resize(props: { screenHeight: number, screenWidth: number, isLandscape: boolean }) {
+    if (props.isLandscape) {
+      this.container.scale.set(0.4)
+    } else {
+      this.container.scale.set(0.6)
+    }
+
+    this.updateBoarder(props.screenHeight)
+    this.container.position.set(props.screenWidth / 2 - this.container.scale.x * 500, 0)
+  }
 }
+
+
+
+
+
+
 

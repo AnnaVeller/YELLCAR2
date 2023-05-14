@@ -6,4 +6,11 @@ export class Scene {
   constructor() {
     this.container = new PIXI.Container()
   }
+
+  public update() {
+
+  }
+
+  public resize(props: { isLandscape: boolean, screenHeight: number, screenWidth: number }) {
+  }
 }

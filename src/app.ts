@@ -12,5 +12,3 @@ const game = new Game({
 })
 
 document.body.appendChild(game.app.view as HTMLCanvasElement)
-
-

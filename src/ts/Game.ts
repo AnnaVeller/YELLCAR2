@@ -5,6 +5,8 @@ import { Scene } from './scenes/Scene'
 export class Game {
   public app: PIXI.Application
   private mainScene: Scene
+  public width: number
+  public height: number
 
   constructor(config: {
     width: number,
@@ -20,11 +22,17 @@ export class Game {
   }
 
   run() {
-    this.mainScene = new MainScene()
+    this.mainScene = new MainScene({ app: this.app })
+    this.mainScene.container.scale.set(0.8)
     this.app.stage.addChild(this.mainScene.container)
+    this.app.ticker.add(() => this.update())
 
     this.resize()
     window.onresize = () => setTimeout(() => this.resize(), 10)
+  }
+
+  public update() {
+    this.mainScene.update()
   }
 
   private screenSize() {
@@ -56,5 +64,10 @@ export class Game {
     const isLandscape = ratio > 1
 
     this.app.renderer.resize(screenWidth, screenHeight)
+
+    this.width = screenWidth
+    this.height = screenHeight
+
+    this.mainScene.resize({ screenHeight, screenWidth, isLandscape })
   }
 }

@@ -9,7 +9,9 @@ export interface BaseConfig {
   delay?: number,
   duration?: number,
   ease?: string,
-  repeat?: number
+  repeat?: number,
+  onRepeat?: () => {},
+  onComplete?: () => {},
 }
 
 export default class Move {
@@ -21,6 +23,8 @@ export default class Move {
   private readonly ease: string
   private readonly animation: GSAPTween
   private readonly repeat: number
+  private readonly onRepeat?: () => {}
+  private readonly onComplete?: () => {}
 
   constructor(config: BaseConfig) {
     this.animateObj = config.object
@@ -31,8 +35,22 @@ export default class Move {
     this.duration = config.duration || 1
     this.ease = config.ease || 'none'
     this.repeat = config.repeat || 0
+    this.onRepeat = config.onRepeat
+    this.onComplete = config.onComplete
 
     this.animation = this.createAnimation()
+  }
+
+  onRepeatHandler() {
+    if (typeof this.onRepeat === 'function') {
+      this.onRepeat()
+    }
+  }
+
+  onCompleteHandler() {
+    if (typeof this.onComplete === 'function') {
+      this.onComplete()
+    }
   }
 
   public start() {
@@ -58,6 +76,8 @@ export default class Move {
         ease: this.ease,
         repeat: this.repeat,
         paused: true,
+        onRepeat: () => this.onRepeatHandler(),
+        onComplete: () => this.onCompleteHandler(),
       })
   }
 }
