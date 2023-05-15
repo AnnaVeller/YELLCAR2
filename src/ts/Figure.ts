@@ -17,8 +17,9 @@ const FORMS = {
   tor: 'tor',
 }
 
-
 export class Figure extends BaseEntity {
+
+  public isEnable: boolean
 
   constructor(config: { x: number, y: number, isRandom: boolean }) {
     super({ image: 'assets/cone.png' })
@@ -28,6 +29,8 @@ export class Figure extends BaseEntity {
     this.sprite.texture = PIXI.Texture.from(`assets/${form}.png`)
 
     this.container.position.set(config.x, config.y)
+
+    this.isEnable = true
   }
 
   private getRandomItem() {
@@ -40,7 +43,14 @@ export class Figure extends BaseEntity {
     return item
   }
 
+  public eat() {
+    this.container.visible = false
+
+    this.isEnable = false
+  }
+
   public destroy() {
+
     this.container.destroy()
   }
 

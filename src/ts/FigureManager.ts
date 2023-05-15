@@ -1,29 +1,36 @@
 import Move from './animations/Move'
 import * as PIXI from 'pixi.js'
 import { Figure } from './Figure'
+import Timer from './animations/Timer'
 
 const ROAD_TEXTURE_HEIGHT = 1500
 const SPEED = 700
 
 export class FigureManager {
-  private animation: Move
   public container: PIXI.Container
   public figures: Array<Figure>
+
+  private animation: Move
+  private timer = new Timer()
 
   constructor() {
     this.container = new PIXI.Container()
     this.figures = []
-    this.createNewFigure()
-    this.createNewFigure()
-    this.createNewFigure()
-    this.createNewFigure()
-    this.createNewFigure()
-    this.createNewFigure()
+
+    this.delayCreation()
   }
 
-  public createNewFigure() {
-    const y = -3 * ROAD_TEXTURE_HEIGHT * Math.random() - 100
-    const figure = new Figure({ x: 90 + 700 * Math.random(), y, isRandom: true })
+  public delayCreation() {
+
+    this.timer.start(0.5, () => {
+      this.createNewFigure(-100)
+      this.delayCreation()
+    })
+  }
+
+  public createNewFigure(y: number) {
+    const x = 90 + 700 * Math.random()
+    const figure = new Figure({ x, y, isRandom: true })
     this.container.addChild(figure.container)
     this.figures.push(figure)
 
@@ -31,13 +38,12 @@ export class FigureManager {
       object: figure.container,
       to: { y: 3 * ROAD_TEXTURE_HEIGHT },
       duration: (3 * ROAD_TEXTURE_HEIGHT - y) / SPEED,
-      onComplete: this.onComplete.bind(this, figure),
+      onComplete: this.onComplete.bind(this, figure, y),
     }).start()
   }
 
-  onComplete(figure: Figure) {
-    this.createNewFigure()
-    // figure.destroy()
+  onComplete(figure: Figure, y: number) {
+    figure.destroy()
     this.figures.splice(this.figures.indexOf(figure), 1)
   }
 }

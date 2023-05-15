@@ -4,6 +4,8 @@ import { Car } from '../Car'
 import * as PIXI from 'pixi.js'
 import { FigureManager } from '../FigureManager'
 import { Figure } from '../Figure'
+import { Counter } from '../Counter'
+import { PlantsManager } from '../PlantsManager'
 
 export class MainScene extends Scene {
   private road: Road
@@ -17,6 +19,10 @@ export class MainScene extends Scene {
   private app: PIXI.Application
 
   private figureManager: FigureManager
+
+  private plantManager: PlantsManager
+
+  private counter: Counter
 
   constructor(config: { app: PIXI.Application }) {
     super()
@@ -35,6 +41,14 @@ export class MainScene extends Scene {
     this.car = new Car({ scene: this })
     this.container.addChild(this.car.container)
 
+    // add counter
+    this.counter = new Counter()
+    this.container.addChild(this.counter.container)
+
+    // add plants
+    this.plantManager = new PlantsManager()
+    this.container.addChild(this.plantManager.container)
+
     document.addEventListener('keydown', (key: KeyboardEvent) => this.onKeyDown(key))
   }
 
@@ -42,11 +56,14 @@ export class MainScene extends Scene {
 
     const playerCord = this.car.container.position
 
-    const figures: Array<Figure> | [] = this.figureManager.figures.filter(figure => this.dist(
-      figure.container.position.x - playerCord.x,
-      figure.container.position.y - playerCord.y) < 120)
+    const figures: Array<Figure> | [] = this.figureManager.figures.filter(figure => figure.isEnable &&
+      this.dist(
+        figure.container.position.x - playerCord.x,
+        figure.container.position.y - playerCord.y) < 120)
 
-    figures.forEach(el => el.container.visible = false)
+    figures.forEach(el => el.eat())
+
+    this.counter.addScore(figures.length)
   }
 
   private dist(a: number, b: number) {
