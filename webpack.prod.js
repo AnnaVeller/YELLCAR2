@@ -7,7 +7,7 @@ const { merge } = require('webpack-merge')
 
 module.exports = merge(base, {
   mode: 'production',
-  devtool: '',
+  devtool: false,
   performance: {
     maxEntrypointSize: 9000000,
     maxAssetSize: 9000000,

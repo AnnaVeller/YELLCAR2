@@ -4,7 +4,7 @@ const CopyPlugin = require('copy-webpack-plugin')
 
 module.exports = {
   mode: 'development',
-  devtool: 'source-map',
+  devtool: 'eval-cheap-source-map',
   entry: './src/app.ts',
   module: {
     rules: [
