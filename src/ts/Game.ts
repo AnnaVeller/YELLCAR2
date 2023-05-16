@@ -7,6 +7,7 @@ export class Game {
   private mainScene: Scene
   public width: number
   public height: number
+  private readonly myEmitter: PIXI.utils.EventEmitter
 
   constructor(config: {
     width: number,
@@ -18,11 +19,13 @@ export class Game {
 
     this.app = new PIXI.Application(config)
 
+    this.myEmitter = new PIXI.utils.EventEmitter()
+
     this.run()
   }
 
   run() {
-    this.mainScene = new MainScene({ app: this.app })
+    this.mainScene = new MainScene({ app: this.app, emitter: this.myEmitter })
     this.mainScene.container.scale.set(0.8)
     this.app.stage.addChild(this.mainScene.container)
     this.app.ticker.add(() => this.update())

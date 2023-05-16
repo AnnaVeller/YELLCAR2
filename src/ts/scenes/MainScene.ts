@@ -1,11 +1,13 @@
 import { Scene } from './Scene'
-import { Road } from '../Road'
-import { Car } from '../Car'
+import { Road } from '../components/Road'
+import { Car } from '../components/Car'
 import * as PIXI from 'pixi.js'
-import { FigureManager } from '../FigureManager'
-import { Figure } from '../Figure'
-import { Counter } from '../Counter'
-import { PlantsManager } from '../PlantsManager'
+import { FigureManager } from '../controllers/FigureManager'
+import { Figure } from '../components/Figure'
+import { Counter } from '../ui/Counter'
+import { PlantsManager } from '../controllers/PlantsManager'
+import { GAME_SETTINGS } from '../config'
+import { HandControl } from '../controllers/HandControl'
 
 export class MainScene extends Scene {
   private road: Road
@@ -24,17 +26,21 @@ export class MainScene extends Scene {
 
   private counter: Counter
 
-  constructor(config: { app: PIXI.Application }) {
+  constructor(config: { app: PIXI.Application, emitter: PIXI.utils.EventEmitter }) {
     super()
 
     this.app = config.app
 
     // add road
-    this.road = new Road()
+    this.road = new Road({ speed: GAME_SETTINGS.speed, roadHeight: GAME_SETTINGS.roadHeight })
     this.container.addChild(this.road.container)
 
     // add figures
-    this.figureManager = new FigureManager()
+    this.figureManager = new FigureManager({
+      speed: GAME_SETTINGS.speed,
+      roadHeight: GAME_SETTINGS.roadHeight,
+      captureR: GAME_SETTINGS.captureR,
+    })
     this.container.addChild(this.figureManager.container)
 
     // add car
@@ -46,28 +52,33 @@ export class MainScene extends Scene {
     this.container.addChild(this.counter.container)
 
     // add plants
-    this.plantManager = new PlantsManager()
+    this.plantManager = new PlantsManager({ speed: GAME_SETTINGS.speed, roadHeight: GAME_SETTINGS.roadHeight })
     this.container.addChild(this.plantManager.container)
 
+
+    const myEmitter = config.emitter
+
+    // add handControl
+    const handControl = new HandControl({ emitter: myEmitter })
+    this.container.addChild(handControl.container)
+
     document.addEventListener('keydown', (key: KeyboardEvent) => this.onKeyDown(key))
+
+    myEmitter.on('right', () => this.car.moveRight())
+    myEmitter.on('left', () => this.car.moveLeft())
+    myEmitter.on('up', () => this.car.moveUp())
+    myEmitter.on('down', () => this.car.moveDown())
   }
 
   override update() {
 
     const playerCord = this.car.container.position
 
-    const figures: Array<Figure> | [] = this.figureManager.figures.filter(figure => figure.isEnable &&
-      this.dist(
-        figure.container.position.x - playerCord.x,
-        figure.container.position.y - playerCord.y) < 120)
+    const figures: Array<Figure> | [] = this.figureManager.getNearFigures(playerCord)
 
-    figures.forEach(el => el.eat())
+    figures.forEach(el => el.captureAnimate(playerCord))
 
     this.counter.addScore(figures.length)
-  }
-
-  private dist(a: number, b: number) {
-    return Math.sqrt(a * a + b * b)
   }
 
   private onKeyDown(key: KeyboardEvent) {

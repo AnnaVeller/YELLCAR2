@@ -1,13 +1,7 @@
 import { BaseEntity } from './BaseEntity'
 import * as PIXI from 'pixi.js'
-
-// const FIGURES_TEXTURE = {
-//   cone: 'assets/cone.png',
-//   cube: 'assets/cube.png',
-//   cylinder: 'assets/cylinder.png',
-//   sphere: 'assets/sphere.png',
-//   tor: 'assets/tor.png',
-// }
+import Move from '../animations/Move'
+import Scale from '../animations/Scale'
 
 const FORMS = {
   cone: 'cone',
@@ -20,6 +14,7 @@ const FORMS = {
 export class Figure extends BaseEntity {
 
   public isEnable: boolean
+  public animation: Move
 
   constructor(config: { x: number, y: number, isRandom: boolean }) {
     super({ image: 'assets/cone.png' })
@@ -43,14 +38,27 @@ export class Figure extends BaseEntity {
     return item
   }
 
-  public eat() {
-    this.container.visible = false
+  public captureAnimate(cord: { x: number, y: number }) {
+    if (this.animation) this.animation.stop()
+
+    new Move({
+      object: this.container,
+      to: { x: cord.x, y: cord.y },
+      duration: 0.1,
+      onComplete: this.destroy.bind(this),
+    }).start()
+
+    new Scale({
+      object: this.container,
+      to: { scaleX: 0, scaleY: 0 },
+      duration: 0.1,
+    }).start()
 
     this.isEnable = false
   }
 
   public destroy() {
-
+    this.container.visible = false
     this.container.destroy()
   }
 

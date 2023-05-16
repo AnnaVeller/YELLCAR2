@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js'
-import Move from './animations/Move'
-import { MainScene } from './scenes/MainScene'
+import Move from '../animations/Move'
+import { MainScene } from '../scenes/MainScene'
 
 const COLORS_TEXTURE = {
   yellow: 'assets/car_color_yellow.png',

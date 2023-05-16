@@ -1,21 +1,22 @@
-import Move from './animations/Move'
+import Move from '../animations/Move'
 import * as PIXI from 'pixi.js'
-import Timer from './animations/Timer'
-import { Plant } from './Plant'
-
-const ROAD_TEXTURE_HEIGHT = 1500
-const SPEED = 700
+import Timer from '../animations/Timer'
+import { Plant } from '../components/Plant'
 
 export class PlantsManager {
-  public container: PIXI.Container
-  public plants: Array<Plant>
+  public readonly container: PIXI.Container
+  public readonly plants: Array<Plant>
 
   private animation: Move
-  private timer = new Timer()
+  private readonly timer = new Timer()
+  private readonly speed: number
+  private readonly roadHeight: number
 
-  constructor() {
+  constructor(config: { speed: number, roadHeight: number }) {
     this.container = new PIXI.Container()
     this.plants = []
+    this.speed = config.speed
+    this.roadHeight = config.roadHeight
 
     this.delayCreation()
   }
@@ -36,8 +37,8 @@ export class PlantsManager {
 
     this.animation = new Move({
       object: plant.container,
-      to: { y: 3 * ROAD_TEXTURE_HEIGHT },
-      duration: (3 * ROAD_TEXTURE_HEIGHT - y) / SPEED,
+      to: { y: 3 * this.roadHeight },
+      duration: (3 * this.roadHeight - y) / this.speed,
       onComplete: this.onComplete.bind(this, plant, y),
     }).start()
   }
