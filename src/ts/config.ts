@@ -1,5 +1,5 @@
 export const GAME_SETTINGS = {
-  speed: 600,
+  speed: 800,
   roadHeight: 1500,
   captureR: 200,
 }

@@ -12,6 +12,7 @@ export interface BaseConfig {
   repeat?: number,
   onRepeat?: () => {},
   onComplete?: () => {},
+  onStart?: () => {},
 }
 
 export default class Move {
@@ -25,6 +26,7 @@ export default class Move {
   private readonly repeat: number
   private readonly onRepeat?: () => {}
   private readonly onComplete?: () => {}
+  private readonly onStart?: () => {}
 
   constructor(config: BaseConfig) {
     this.animateObj = config.object
@@ -37,8 +39,15 @@ export default class Move {
     this.repeat = config.repeat || 0
     this.onRepeat = config.onRepeat
     this.onComplete = config.onComplete
+    this.onStart = config.onStart
 
     this.animation = this.createAnimation()
+  }
+
+  onStartHandler() {
+    if (typeof this.onStart === 'function') {
+      this.onStart()
+    }
   }
 
   onRepeatHandler() {
@@ -77,6 +86,7 @@ export default class Move {
         repeat: this.repeat,
         paused: true,
         onRepeat: () => this.onRepeatHandler(),
+        onStart: () => this.onStartHandler(),
         onComplete: () => this.onCompleteHandler(),
       })
   }

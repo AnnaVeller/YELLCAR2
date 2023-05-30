@@ -1,13 +1,14 @@
 import * as PIXI from 'pixi.js'
+import { Car } from '../components/Car'
 
 export class HandControl {
   public container: PIXI.Container
   private readonly rect: PIXI.Sprite
   private isPush: boolean
   private cords: { x: number, y: number } | null
-  private myEmitter: PIXI.utils.EventEmitter
+  private object: Car
 
-  constructor(config: { emitter: PIXI.utils.EventEmitter }) {
+  constructor(config: { object: Car }) {
     this.container = new PIXI.Container()
 
     this.rect = PIXI.Sprite.from('assets/rect.png')
@@ -27,8 +28,7 @@ export class HandControl {
 
     this.isPush = false
 
-    this.myEmitter = config.emitter
-
+    this.object = config.object
   }
 
   private setCords(point: PIXI.Point) {
@@ -44,35 +44,16 @@ export class HandControl {
     if (!this.isPush) return
 
     const dx = this.cords.x - point.x
-    const dy = this.cords.y - point.y
 
-    const d = 20
+    const ds = dx * 1.5
 
-    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > d) {
-
-      if (dx > 0) {
-        this.myEmitter.emit('left')
-      } else {
-        this.myEmitter.emit('right')
-      }
-
-      this.setCords(point)
-      return
+    if (dx > 0) {
+      this.object.moveLeft(ds)
+    } else {
+      this.object.moveRight(-ds)
     }
 
-    if (Math.abs(dx) <= Math.abs(dy) && Math.abs(dy) > d) {
-
-      if (dy > 0) {
-        this.myEmitter.emit('up')
-      } else {
-        this.myEmitter.emit('down')
-      }
-
-      this.setCords(point)
-      return
-
-    }
-
+    this.setCords(point)
   }
 
   private onPointerUp(point: PIXI.Point) {

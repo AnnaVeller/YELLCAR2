@@ -8,7 +8,7 @@ export class Plant {
   constructor(config: { x: number, y: number }) {
 
     const num = this.randomInteger(1, 4)
-    this.sprite = PIXI.Sprite.from(`assets/plant_${num}.png`)
+    this.sprite = PIXI.Sprite.from(`assets/plants/plant_${num}.png`)
 
     this.sprite.angle = this.randomInteger(-90, 90)
     this.sprite.scale.set(0.9)

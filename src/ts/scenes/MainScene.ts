@@ -55,19 +55,13 @@ export class MainScene extends Scene {
     this.plantManager = new PlantsManager({ speed: GAME_SETTINGS.speed, roadHeight: GAME_SETTINGS.roadHeight })
     this.container.addChild(this.plantManager.container)
 
-
-    const myEmitter = config.emitter
-
     // add handControl
-    const handControl = new HandControl({ emitter: myEmitter })
+    const handControl = new HandControl({ object: this.car })
     this.container.addChild(handControl.container)
 
-    document.addEventListener('keydown', (key: KeyboardEvent) => this.onKeyDown(key))
-
-    myEmitter.on('right', () => this.car.moveRight())
-    myEmitter.on('left', () => this.car.moveLeft())
-    myEmitter.on('up', () => this.car.moveUp())
-    myEmitter.on('down', () => this.car.moveDown())
+    // const myEmitter = config.emitter
+    // myEmitter.emit('right', () => this.car.moveRight())
+    // myEmitter.on('right', () => this.car.moveRight())
   }
 
   override update() {
@@ -81,39 +75,13 @@ export class MainScene extends Scene {
     this.counter.addScore(figures.length)
   }
 
-  private onKeyDown(key: KeyboardEvent) {
-    // A Key = 65
-    // Left arrow = 37
-    if (key.keyCode === 65 || key.keyCode === 37) {
-      this.car.moveLeft()
-    }
+  public checkBorderLeft(x: number) {
+    return x < this.leftBoarder ? this.leftBoarder : x
 
-    // W Key = 87
-    // Up arrow = 38
-    if (key.keyCode === 87 || key.keyCode === 38) {
-      this.car.moveUp()
-    }
-
-    // D Key = 68
-    // Right arrow = 39
-    if (key.keyCode === 68 || key.keyCode === 39) {
-      this.car.moveRight()
-    }
-
-    // S Key = 83
-    // Down arrow = 40
-    if (key.keyCode === 83 || key.keyCode === 40) {
-      this.car.moveDown()
-    }
   }
 
-  public checkBorders(x: number, y: number) {
-    if (x < this.leftBoarder) x = this.leftBoarder
-    if (x > this.rightBoarder) x = this.rightBoarder
-    if (y < this.upBoarder) y = this.upBoarder
-    if (y > this.downBoarder) y = this.downBoarder
-
-    return { x, y }
+  public checkBorderRight(x: number) {
+    return x > this.rightBoarder ? this.rightBoarder : x
   }
 
   private updateBoarder(screenHeight: number) {
@@ -131,6 +99,7 @@ export class MainScene extends Scene {
     }
 
     this.updateBoarder(props.screenHeight)
+    this.car.container.position.y = props.screenHeight / this.container.scale.x - 400
     this.container.position.set(props.screenWidth / 2 - this.container.scale.x * 500, 0)
   }
 }

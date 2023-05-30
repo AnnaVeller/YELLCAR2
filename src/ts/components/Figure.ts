@@ -5,10 +5,18 @@ import Scale from '../animations/Scale'
 
 const FORMS = {
   cone: 'cone',
-  cube: 'cube',
-  cylinder: 'cylinder',
   sphere: 'sphere',
   tor: 'tor',
+  // cube: 'cube',
+  // cylinder: 'cylinder',
+}
+
+const COLORS = {
+  blue: 'blue',
+  green: 'green',
+  orange: 'orange',
+  pink: 'pink',
+  yellow: 'yellow',
 }
 
 export class Figure extends BaseEntity {
@@ -17,21 +25,30 @@ export class Figure extends BaseEntity {
   public animation: Move
 
   constructor(config: { x: number, y: number, isRandom: boolean }) {
-    super({ image: 'assets/cone.png' })
+    super({ image: 'assets/figures/cone_yellow.png' })
 
-    const form: string = this.getRandomItem()
+    const form: string = this.getRandomItem(FORMS)
+    const color: string = this.getRandomItem(COLORS)
 
-    this.sprite.texture = PIXI.Texture.from(`assets/${form}.png`)
+    this.sprite.texture = PIXI.Texture.from(`assets/figures/${form}_${color}.png`)
+
+    this.sprite.anchor.set(0.5)
 
     this.container.position.set(config.x, config.y)
 
     this.isEnable = true
+
+    // const g = new PIXI.Graphics()
+    // g.beginFill(0xDE3249, 1)
+    // g.drawCircle(0, 0, 30)
+    // g.endFill()
+    // this.container.addChild(g)
   }
 
-  private getRandomItem() {
-    const randomIndex = Math.floor(Math.random() * Object.keys(FORMS).length)
+  private getRandomItem(object: object) {
+    const randomIndex = Math.floor(Math.random() * Object.keys(object).length)
 
-    const forms = Object.keys(FORMS)
+    const forms = Object.keys(object)
 
     const item: string = forms[randomIndex]
 
